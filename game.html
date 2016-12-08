@@ -1,0 +1,285 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Game</title>
+
+<script>var zon = true; </script>
+<script src="https://d309knd7es5f10.cloudfront.net/zim_4.1.2.js"></script>
+<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+<script src="https://d309knd7es5f10.cloudfront.net/pizzazz_01.js"></script>
+<script src="http://zimjs.com/code/bits/footer2.js"></script><!-- you will not need this -->
+
+<style>
+	body {margin:0px; padding:0px; background-color:#111;}
+</style>
+
+<script>
+
+
+var scaling = "fit"; 
+var width = 1280;
+var height = 768;
+var color = "#222";
+var frame = new zim.Frame(scaling, width, height, color);
+frame.on("ready", function() {
+	zog("ready from ZIM Frame");
+
+	var stage = frame.stage;
+	var stageW = frame.width;
+	var stageH = frame.height;
+
+	// loadAssets
+	frame.loadAssets([
+		"earth.png",
+		"planet.png",
+		"sceneBacking.png",
+		"monster.png",
+		"blue.png",
+		"pink.png",
+		"yellow.png",
+		"fireball.png",
+		"grey-planet1.png",
+        "grey-planet2.png",
+        "grey-planet5.png",
+        "mons4.png",
+        "mons2.png",
+        "GAME OVER.png",
+        "sceneBacking2.png",
+        "BGmusic.wav",
+        "planet2.png"
+	], "assets/");
+
+	frame.on("complete", function() {
+         frame.asset("BGmusic.wav").play({loop:-1});
+		var animation = new zim.Container(stageW, stageH);
+		stage.addChild(animation);
+		var backgroundPic = frame.asset("sceneBacking.png");
+		animation.addChild(backgroundPic);
+		var background = new zim.Scroller({backing:backgroundPic, speed:2});
+
+////DAISY:THE BACKGROUND PLANTES////
+
+
+        var gery2 = frame.asset("grey-planet2.png");
+        gery2.y = -450;
+        animation.addChild(gery2);
+        var gery2 = new zim.Scroller({backing:gery2, speed:2.5, gapFix:4});
+
+        var gery6 = frame.asset("grey-planet5.png");
+        gery6.scale(1.5);
+        gery6.y = 180;
+       
+        animation.addChild(gery6);
+        var gery6 = new zim.Scroller({backing:gery6, speed:1.6});
+
+  ///The end of the planet background////
+
+///////////////////////////////////
+////////////Calculator/////////////
+///////////////////////////////////
+    var icon = frame.asset("planet2.png");
+    icon.scale(.2);
+    icon.x = stageW-230;
+    icon.y = 95;
+    animation.addChild(icon);
+
+    var text = new createjs.Text("x", "50px Arial", "white");
+    text.x = stageW-150;
+    text.y = 100;
+    animation.addChild(text);
+    
+    var scorePanel = new zim.Container();
+	animation.addChild(scorePanel);
+	scorePanel.setBounds(0, 0, 60, 60);
+
+	var scoreText = new zim.Label({
+		text:"0", 
+		size:65,
+		align:"center",
+		color:"white",
+	});
+
+	scoreText.center(scorePanel);
+	scorePanel.x = stageW - 120;
+	scorePanel.y = 100;
+
+////////////////////////////////////////////////
+////////////////////Monster/////////////////////
+////////////////////////////////////////////////
+
+     var monster = new zim.Container();
+     monster.x = 500;
+     monster.y = 300;
+     monster.scale(.3);
+    
+        var monA = frame.asset("mons4.png");
+        monA.center(monster);
+       
+        var monB = frame.asset("mons2.png");
+       
+        monB.center(monster,false);
+
+        setInterval(function(){
+           if(monster.contains(monA)){
+            monster.removeChild(monA);
+            monster.addChild(monB);  
+           }
+           else{
+             monster.removeChild(monB);
+            monster.addChild(monA); 
+           }
+        },350);
+
+        animation.addChild(monster);
+        monster.center(animation);
+        monster.scale(0.45);
+
+////////////////////////////////////////////////
+////////////////////Fireball/////////////////////
+////////////////////////////////////////////////		
+
+		var fireball = frame.asset("fireball.png");
+		
+////////////////////////////////////////////////
+////////////////////PLANET//////////////////////
+////////////////////////////////////////////////
+
+        var game = new zim.Container();
+        animation.addChild(game);
+
+
+		window.addEventListener("keydown", startGame);
+		function startGame() {
+			window.removeEventListener("keydown", startGame);
+			zog("one")
+			zim.Ticker.add(animate3,stage);
+			movePlanet();
+		};
+
+		var planets = new zim.Container();
+		game.addChild(planets);
+		var num= 1000;
+
+		function movePlanet() {
+			setTimeout(function() {
+				requestAnimationFrame(movePlanet);
+				var choice = ["earth.png","planet.png","blue.png","pink.png","yellow.png"];
+				for(var i=0; i<num; i++) {
+				    var rand = zim.rand(0,4);
+					var planet = frame.asset(choice[rand]);				
+					planet.scale(.25);
+			        planet.x = animation.width;
+				    planet.y = zim.rand(0, planet.height+300);				
+				};
+				    planets.addChild(planet);
+				    planet.move(-stageW*2,planet.y,4000,"linear",function(t){
+            		    animation.removeChild(t);
+            	});        	
+			},  1500);
+		};
+
+////////////////////////////////////////////////
+////////////LFT UP RIGHT DOWN SPACE/////////////
+////////////////////////////////////////////////
+
+	        var left = false;
+            var right =false;
+            var up = false;
+            var dw = false;	
+
+            setInterval(moving,100);
+            function moving(){
+                if (left){
+                    monster.animate({obj:{x:monster.x-50}, time:100, ease:"linear"});
+                }else if (up) {
+				monster.animate({obj:{y:monster.y-50}, time:100, ease:"linear"});
+                }else if (right) {
+				monster.animate({obj:{x:monster.x+50}, time:100, ease:"linear"});
+                }else if (dw) {
+				monster.animate({obj:{y:monster.y+50}, time:100, ease:"linear"});
+            };
+        };
+         
+window.addEventListener("keydown", animate);
+		function animate(ev){
+			var ev = ev || event;
+            var  code= ev.keyCode;
+            if (code == 32){  	
+            	fireball.scale(.2);
+            	animation.addChild(fireball);
+            	fireball.x = monster.x+150;
+                fireball.y = monster.y+30;
+            	fireball.move(stageW*2,fireball.y,1000,"linear",function(t){
+            		    animation.removeChild(t);
+            	});        	
+            }
+            switch (code) {
+                case 37:
+                left = true;
+                break;
+                case 38:
+                up = true;
+                break;
+                case 39:
+                right = true;
+                break;
+                case 40:
+                dw = true;
+                break;
+            };
+        };
+
+	window.addEventListener("keyup", animate2);
+            function animate2(ev){
+                var ev = ev || event;
+                var code = ev.keyCode;
+                switch (code) {
+                    case 37:
+                    left = false;
+                    break;
+                    case 38:
+                    up = false;
+                    break;
+                    case 39:
+                    right = false;
+                    break;
+                    case 40:
+                    dw = false;
+                    break;
+                };
+            };
+
+////////////////////////////////////////////////
+////////////////////HITTEST/////////////////////
+////////////////////////////////////////////////
+
+	function animate3(){
+			var planet;
+			var score
+			for (var i=0; i<planets.numChildren; i++) {
+				planet = planets.getChildAt(i);
+            	if(monster.hitTestBounds(planet)){
+            		zgo("over.html");
+            	}
+            	if(fireball.hitTestBounds(planet)){
+            		planets.removeChild(planet)
+            		scoreText.text++;
+            			}
+            	}
+		};
+	}); 
+
+	stage.update();
+
+}); // end of ready
+
+</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimal-ui" />
+
+</head>
+
+<body>
+</body>
+</html>

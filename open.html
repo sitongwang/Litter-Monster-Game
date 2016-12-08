@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Open</title>
+<!-- for CreateJS and ZIMjs http://zimjs.com - free to modify - Dan Zen 2016 -->
+<!-- see http://zimjs.com/templates for more templates and meta tags -->
+<script>var zon = true; // true for comments from zim code</script>
+<script src="https://d309knd7es5f10.cloudfront.net/zim_4.1.2.js"></script>
+<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+<script src="http://zimjs.com/code/bits/footer2.js"></script><!-- you will not need this -->
+<style>
+    body {margin:0px; padding:0px; background-color:#111;}
+</style>
+<script>
+// SCALING OPTIONS
+// scaling can have values as follows with full being the default
+// "fit"  sets canvas and stage to dimensions and scales to fit inside window size
+// "outside"  sets canvas and stage to dimensions and scales to fit outside window size
+// "full" sets stage to window size with no scaling
+// "tagID"    add canvas to HTML tag of ID - set to dimensions if provided - no scaling
+var scaling = "fit"; // this will resize to fit inside the screen dimensions
+var width = 1280;
+var height = 768;
+var color = "#222";
+var frame = new zim.Frame(scaling, width, height, color);
+frame.on("ready", function() {
+    zog("ready from ZIM Frame");
+    var stage = frame.stage;
+    var stageW = frame.width;
+    var stageH = frame.height;
+    
+    // 1. load the background assets using frame.loadAssets
+    frame.loadAssets([
+        "sceneBacking.png",
+        "earth.png",
+        "blue.png",
+        "planet.png",
+        "pink.png",
+        "yellow.png",
+        "monster.png",
+        "BGmusic.wav"
+    ], "assets/");
+    // 2. when the assets are ready call a function
+    frame.on("complete", function() {
+        frame.asset("BGmusic.wav").play();
+        
+        //Create start-interface Container
+        var start = new zim.Container();
+        stage.addChild(start);
+       // 3. create a container for all the objects being scrolled (optional)
+        var animation1 = new zim.Container(stageW, stageH);
+        start.addChild(animation1);
+        // 4. add the background pic to the stage and position or scale
+        var backgroundPic = frame.asset("sceneBacking.png");
+        // backgroundPic.scale(.5);
+        //backgroundPic.y = 200;
+        animation1.addChild(backgroundPic);
+        var background = new zim.Scroller({backing:backgroundPic, speed:.5});
+       
+      //Set planet assets
+        var item1 = frame.asset( "earth.png" );
+        item1.scale(.3);
+        item1.x = 850;
+        item1.y = 295;
+        start.addChild(item1);
+        var item2 = frame.asset( "yellow.png" );
+        item2.scale(.3);
+        item2.x = 720;
+        item2.y = 295;
+        start.addChild(item2);
+        var item3 = frame.asset( "planet.png");
+        item3.scale(.3);
+        item3.x = 580;
+        item3.y = 295;
+        start.addChild(item3);
+        var item4 = frame.asset( "blue.png" );
+        item4.scale(.3);
+        item4.x = 440;
+        item4.y = 290;
+        start.addChild(item4);
+        var item5 = frame.asset( "pink.png" );
+        item5.scale(.28);
+        item5.x = 245;
+        item5.y = 295;
+        start.addChild(item5);
+     // Set monster
+        var monster = frame.asset("monster.png");
+        monster.scale(.3);
+        monster.x =100;
+        monster.y =100;
+        monster.centerReg();
+        start.addChild(monster);
+        monster.move(900, 100, 2000,"backOut");
+        stage.on("stagemousedown", function() {
+            start.addChild(monster);
+            monster.move(stage.mouseX, stage.mouseY, 500);
+        });
+     // Add start button
+     
+        var button = new zim.Button(200, 80, "PRESS SPACE TO START",0);
+        start.addChild(button)
+        button.x = 540;
+        button.y = 450;
+        button.on("click", function() { 
+              zog("clicking");
+              });
+        zim.animate({
+              target:button,
+              obj:{alpha:.5}, 
+              time:2000,
+              props:{rewind:true, loop:true, count:5}
+              });
+        var boxes = [];
+        var box;
+        for (var i=0; i<10; i++) {
+        box = new zim.Rectangle(25, 25, "skyblue");
+        box.cache(0,0,10,10);
+        start.addChild(box);
+        box.x = 540 + i*20;
+        box.y = 520;
+        box.alpha = 0;
+        boxes.push(box);
+        }
+        zim.animate({target:boxes, obj:{alpha:1}, time:500, loop:true, rewind:true, sequence:50});
+     
+
+     //Button switch
+        // var game = new zim.Circle(200,"blue");
+        // stage.addChild(game);
+        // game.center(stage);  
+        // game.alpha = 0;
+        // var caseNumber = 1;
+        
+        // button.on("click", function() {
+        //     zgo("game.html");
+        // })
+
+        window.addEventListener("keydown", startGame);
+        function startGame(e){
+        if (e.keyCode == 32){
+                    zgo("game.html");
+                }
+            }
+
+        
+    }); // end assets complete
+    
+    stage.update();
+}); // end of ready
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimal-ui" />
+</head>
+<body>
+<!-- canvas with id="myCanvas" is made by zim Frame -->
+</body>
+</html>

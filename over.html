@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+
+
+
+<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+<script>var zon = true; // true for comments from zim code</script>
+<script src="https://d309knd7es5f10.cloudfront.net/zim_4.3.0.js"></script>
+<script src="https://d309knd7es5f10.cloudfront.net/pizzazz_01.js"></script>
+<style>
+	body {margin:0px; padding:0px; background-color:#111;}
+</style>
+
+<script>
+
+var scaling = "fit"; // this will resize to fit inside the screen dimensions
+var width = 1280;
+var height = 768;
+var color = "#222";
+var frame = new zim.Frame(scaling, width, height, color);
+frame.on("ready", function() {
+	zog("ready from ZIM Frame");
+
+	var stage = frame.stage;
+	var stageW = frame.width;
+	var stageH = frame.height;
+
+///////////////////////////////////
+//////CHRISTY:GAME OVER////////////
+///////////////////////////////////
+
+    frame.loadAssets([
+		"sceneBacking.png",
+		"GAME OVER.png",
+		"fail.mp3"
+	], "assets/");
+
+	frame.on("complete", function() {
+		frame.asset("fail.mp3").play();
+		var over = new zim.Container();
+		stage.addChild(over);
+
+
+		var animation = new zim.Container(stageW, stageH);
+		over.addChild(animation);
+		var backgroundPic = frame.asset("sceneBacking.png");		
+		animation.addChild(backgroundPic);
+		var background = new zim.Scroller({backing:backgroundPic, speed:2});
+		var monster = frame.asset("GAME OVER.png");
+		monster.scale(.5);
+		monster.x = 220;
+		monster.y = 220;
+		over.addChild(monster);
+    
+    var label = new zim.Label;
+
+	setTimeout(function() {
+	        label = new zim.Label({
+			text:"G A M E\nO V E R",
+			size:80,
+			font:"wildwood",
+			color:"white",
+			align:"center"
+		});
+
+		label.center(over);
+		label.alpha = 0;
+		label.animate({alpha:1}, 1000);
+	}, 1000);
+
+    setTimeout(function(){
+            over.removeChild(label);
+            stage.update();
+        },4000);
+
+  
+    setTimeout(function() {
+        pizzazz.listShapes();
+		var shape = "cloud";
+        var shape1 = pizzazz.makeShape(shape, frame.green, 300);
+        var shape2 = pizzazz.makeShape(shape, frame.tin, 300);
+
+	    var button = new zim.Button({
+        width:200, height:60,
+        label:"RESTART",
+        backing:shape1,
+        rollBacking:shape2
+    });
+	    button.center(over);
+	    over.addChild(button);
+		button.alpha = 0;
+		button.animate({alpha:1}, 4200);
+
+		window.addEventListener("keydown", startGame);
+        function startGame(e){
+        if (e.keyCode == 32){
+                    zgo("game.html");
+                }
+            }
+	}, 4200);
+
+ 	});
+
+  	stage.update();
+
+}); // end of ready
+
+</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimal-ui" />
+
+</head>
+
+<body>
+<div style="font-family:wildwood; opacity:.01">.</div>
+</body>
+</html>
